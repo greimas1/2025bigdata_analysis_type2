@@ -1,0 +1,44 @@
+library(dplyr)
+library(randomForest)
+library(caret)
+
+rdata <-read.csv("data/customer_train.csv")
+rdata2 <- read.csv("data/customer_test.csv")
+
+#str(rdata)
+#summary(rdata)
+rdata$성별 <- as.factor(rdata$성별)
+#str(rdata)
+
+idx <- sample(1:nrow(rdata), nrow(rdata)*0.8)
+train <- rdata[idx,-1]
+test <- rdata[-idx,-1]
+
+md1 <- randomForest(성별~., data=train, ntree=300)
+#pred1 <- predict(md1, newdata = test, ntree=300, type = "response")
+#ntree는 모델 생성 시 randomForest()에서만 사용합니다. 
+#predict()에서는 사용하지 않습니다.
+pred1 <- predict(md1, newdata = test)
+pred1 <- as.facotr(pred1)
+
+#confusionMatrix(pred1, reference=test$성별)
+confusionMatrix(pred1, reference=test$성별
+#caret::confusionMatrix()는 기본적으로 confusionMatrix(data, reference) 형태인데, 
+#이건 맞습니다. 
+#다만 pred1과 test$성별이 factor 타입이고, 수준(level)이 동일한지도 확인 필요합니다.
+
+md2 <- randomForest(성별~., data=rdata[,-1], ntree=300)
+pred2 <- predict(md2, newdata=rdata2[,-1], type = "response")
+#pred2 <- predict(md2, newdata=rdata2[,-1], type = "response")
+#pred2 <- predict(md2, newdata=rdata2[,-1], ntree=300, type = "response")
+
+
+
+#pred <- as.data.frame(pred2)
+pred <- data.frame(pred2)
+colnames(pred) <- c("pred")
+
+result <- pred
+
+#write.csv(result,"수험번호2025.05.07.cscv", row.names="FALSE")
+write.csv(result, "수험번호2025.05.07.csv", row.names = FALSE)
