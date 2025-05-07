@@ -1,0 +1,34 @@
+library(dplyr)
+library(randomForest)
+library(caret)
+
+rdata <-read.csv("data/customer_train.csv")
+rdata2 <- read.csv("data/customer_test.csv")
+
+#str(rdata)
+#summary(rdata)
+rdata$성별 <- as.factor(rdata$성별)
+#str(rdata)
+
+idx <- sample(1:nrow(rdata), nrow(rdata)*0.8)
+train <- rdata[idx,-1]
+test <- rdata[-idx,-1]
+
+md1 <- randomForest(성별~., data=train, ntree=300)
+pred1 <- predict(md1, newdata = test, ntree=300, type = "response")
+
+confusionMatrix(pred1, reference=test$성별)
+
+
+md2 <- randomForest(성별~., data=rdata[,-1], ntree=300)
+pred2 <- predict(md2, newdata=rdata2[,-1], ntree=300, type = "response")
+
+pred <- as.data.frame(pred2)
+colnames(pred) <- c("pred")
+
+result <- pred
+
+write.csv(result,"수험번호2025.05.07.cscv", row.names="FALSE")
+
+
+
